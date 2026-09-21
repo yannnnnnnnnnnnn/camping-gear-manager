@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>露營裝備盤點</title>
+  <style>
+    :root{--green:#285943;--light:#f3f7f2;--line:#d9e3d8;--accent:#d9772a;--text:#26352b}
+    *{box-sizing:border-box}body{margin:0;background:var(--light);color:var(--text);font:16px/1.6 system-ui,-apple-system,"Microsoft JhengHei",sans-serif}
+    header{background:var(--green);color:#fff;padding:28px max(20px,calc((100% - 1180px)/2))}
+    header h1{margin:0 0 4px;font-size:clamp(24px,4vw,36px)}header p{margin:0;opacity:.86}
+    main{max-width:1180px;margin:24px auto;padding:0 20px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+    .tab,button{border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font:inherit}.tab{background:#e2ebe1;color:var(--green);font-weight:700}.tab.active{background:var(--green);color:#fff}
+    .panel{display:none}.panel.active{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:18px;box-shadow:0 2px 8px #234d2410}
+    h2{margin:0 0 14px;color:var(--green);font-size:22px}h3{margin:18px 0 8px;color:var(--green)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+    label{display:block;font-weight:700}input,select,textarea{width:100%;padding:9px;border:1px solid #cbd8ca;border-radius:7px;margin-top:4px;font:inherit;background:#fff}textarea{min-height:90px;resize:vertical}
+    .checks{border:1px solid #cbd8ca;border-radius:7px;padding:9px;margin-top:4px;min-height:44px}.checks label{display:inline-flex;align-items:center;gap:6px;margin:3px 12px 3px 0;font-weight:400}.checks input{width:auto;margin:0}
+    button.primary{background:var(--green);color:#fff}.secondary{background:#e8efe7;color:var(--green)}.danger{background:#fde8e5;color:#a7352a}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+    table{width:100%;border-collapse:collapse;margin-top:12px}th,td{text-align:left;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}th{color:var(--green);background:#f6faf5}
+    .muted{color:#68766b}.empty{text-align:center;padding:24px;color:#68766b}.tag{display:inline-block;background:#edf4eb;border-radius:99px;padding:2px 9px;margin:2px;font-size:14px}.trip{border-left:4px solid var(--accent);padding-left:14px;margin:16px 0}.trip img{max-width:180px;max-height:130px;object-fit:cover;border-radius:8px;margin:8px 8px 0 0}
+    @media(max-width:650px){table{display:block;overflow-x:auto;white-space:nowrap}.card{padding:15px}}
+  </style>
+</head>
+<body>
+  <header><h1>⛺ 露營裝備盤點</h1><p>先知道有什麼，再安排誰來帶，最後留下每次出發的回憶。</p></header>
+  <main>
+    <nav class="tabs" aria-label="功能選單">
+      <button class="tab active" data-tab="people">人員與裝備</button><button class="tab" data-tab="assign">攜帶分配</button><button class="tab" data-tab="trips">露營紀錄</button>
+    </nav>
+    <section id="people" class="panel active">
+      <div class="card"><h2>人員管理（新增／修改／刪除）</h2><p class="muted">先在這裡建立同行人員；建立後可直接修改姓名或刪除人員。</p><form id="personForm" class="grid"><label>新增姓名<input id="personName" required placeholder="例如：小明"></label><div class="actions"><button class="primary">新增人員</button></div></form><div id="peopleList"></div></div>
+      <div class="card"><h2>登記個人現有裝備</h2><form id="gearForm" class="grid"><label>裝備名稱<input id="gearName" required placeholder="例如：睡袋"></label><label>擁有人<select id="gearOwner" required></select></label><label>數量<input id="gearQty" type="number" min="1" value="1" required></label><label>備註<input id="gearNote" placeholder="尺寸、品牌或狀況"></label><div class="actions"><button class="primary">加入盤點</button></div></form><div id="gearList"></div></div>
+    </section>
+    <section id="assign" class="panel"><div class="card"><h2>建立出團</h2><form id="outingForm" class="grid"><label>出團日期<input id="outingDate" type="date" required></label><label>園區／地點<input id="outingPlace" required placeholder="例如：阿里山露營區"></label><div class="actions"><button class="primary">新增出團</button></div></form><div id="outingList"></div></div><div class="card"><h2>分配本次出團裝備</h2><p class="muted">請先新增並選擇出團；裝備與人員會直接使用「人員與裝備」的資料。</p><form id="assignForm" class="grid"><label>選擇出團<select id="assignOuting" required></select></label><label>裝備（已登記）<select id="assignGear" required></select></label><label>由誰攜帶<select id="assignPerson" required></select></label><label>數量<input id="assignQty" type="number" min="1" value="1" required></label><div class="actions"><button class="primary">加入分配清單</button><button type="button" class="secondary" id="clearAssign">清空分配</button></div></form><div id="assignList"></div></div></section>
+    <section id="trips" class="panel"><div class="card"><h2>新增露營紀錄</h2><form id="tripForm"><div class="grid"><label>露營日期<input id="tripDate" type="date" required></label><label>營地／地點<input id="tripPlace" required placeholder="例如：阿里山露營區"></label><div><label>參與人員（可複選）</label><div id="tripParticipants" class="checks"></div></div><label>其他參與人員（選填）<input id="tripOtherParticipants" placeholder="例如：阿凱、小美，以逗號分隔"></label><label>地圖連結（選填）<input id="tripMap" type="url" placeholder="貼上 Google Maps 連結"></label><label>評分（1–5）<input id="tripRating" type="number" min="1" max="5" placeholder="5"></label></div><p class="muted">直接點擊姓名即可勾選；不在清單中的同行者請輸入姓名，多人請用逗號分隔。</p><label style="margin-top:12px">評論與心得<textarea id="tripReview" placeholder="交通、衛浴、景色、下次改進事項…"></textarea></label><label style="margin-top:12px">上傳圖片（可多選）<input id="tripPhotos" type="file" accept="image/*" multiple></label><div class="actions"><button class="primary">儲存紀錄</button></div></form><div id="tripList"></div></div></section>
+  </main>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    const supabaseClient=window.supabase.createClient('https://gvivuprejqjqwthfphoq.supabase.co','eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imd2aXZ1cHJlanFqcXd0aGZwaG9xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODk5NDMwMjcsImV4cCI6MjEwNTUxOTAyN30.ihLGrs8n9M3LJKSOTldPWv2lKMHzZ031fGvWMubyn-o');
+    const key='camping-inventory-v1', defaultData={people:[],gear:[],assign:[],trips:[],outings:[]};
+    let data=Object.assign({},defaultData,JSON.parse(localStorage.getItem(key)||'{}'));
+    const $=id=>document.getElementById(id);
+    async function save(){localStorage.setItem(key,JSON.stringify(data));render();const {error}=await supabaseClient.from('app_state').upsert({id:1,data,updated_at:new Date().toISOString()});if(error)alert('雲端同步失敗：'+error.message)}
+    async function loadData(){const {data:row,error}=await supabaseClient.from('app_state').select('data').eq('id',1).maybeSingle();if(error){alert('讀取雲端資料失敗，將使用本機資料：'+error.message);render();return}if(row?.data&&Object.keys(row.data).length){data=Object.assign({},defaultData,row.data);localStorage.setItem(key,JSON.stringify(data))}render()}
+    function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+    function render(){
+      $('gearOwner').innerHTML=data.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')||'<option value="">請先新增人員</option>';
+      $('assignPerson').innerHTML=data.people.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join('')||'<option value="">請先新增人員</option>';
+      $('assignGear').innerHTML=data.gear.map((g,i)=>`<option value="${i}">${esc(g.name)}（${esc(data.people.find(p=>p.id===g.owner)?.name||'未指定')}，現有 ${g.qty}）</option>`).join('')||'<option value="">請先登記裝備</option>';
+      $('assignOuting').innerHTML=data.outings.map((o,i)=>`<option value="${i}">${esc(o.place)}｜${esc(o.date)}</option>`).join('')||'<option value="">請先新增出團</option>';
+      $('outingList').innerHTML=data.outings.length?`<h3>已建立出團</h3><div>${data.outings.map((o,i)=>`<span class="tag">${esc(o.place)}｜${esc(o.date)} <button class="danger" data-del-outing="${i}" title="刪除">×</button></span>`).join('')}</div>`:'<p class="empty">尚未建立出團。</p>';
+      $('tripParticipants').innerHTML=data.people.map(p=>`<label><input type="checkbox" value="${p.id}"> ${esc(p.name)}</label>`).join('')||'<span class="muted">尚未建立人員，可使用下方自由輸入。</span>';
+      $('peopleList').innerHTML=data.people.length?`<h3>已建立人員</h3><table><tr><th>姓名</th><th>操作</th></tr>${data.people.map(p=>`<tr><td><input value="${esc(p.name)}" data-person-name="${p.id}"></td><td><button type="button" class="secondary" data-save-person="${p.id}">修改名稱</button> <button type="button" class="danger" data-del-person="${p.id}">刪除</button></td></tr>`).join('')}</table>`:'<p class="empty">尚未新增人員；請使用上方「新增姓名」欄位建立第一位人員。</p>';
+      $('gearList').innerHTML=data.gear.length?`<h3>現有裝備</h3><table><tr><th>裝備</th><th>擁有人</th><th>數量</th><th>備註</th><th></th></tr>${data.gear.map((g,i)=>`<tr><td>${esc(g.name)}</td><td>${esc(data.people.find(p=>p.id===g.owner)?.name||'未指定')}</td><td>${g.qty}</td><td>${esc(g.note)}</td><td><button class="danger" data-del-gear="${i}">刪除</button></td></tr>`).join('')}</table>`:'<p class="empty">尚未登記裝備。</p>';
+      const groups={};data.assign.forEach((a,i)=>{const outing=data.outings[a.outing]||{};const key=`${outing.date||a.date||'未指定日期'}|${outing.place||a.place||'未指定園區'}`;(groups[key]??=[]).push({...a,index:i})});$('assignList').innerHTML=data.assign.length?Object.entries(groups).map(([key,items])=>{const [date,place]=key.split('|');return `<h3>${esc(place)} <span class="muted">｜${esc(date)}</span></h3><table><tr><th>裝備</th><th>攜帶者</th><th>數量</th><th></th></tr>${items.map(a=>`<tr><td>${esc(data.gear[a.gear]?.name||a.name||'未指定')}</td><td>${esc(data.people.find(p=>p.id===a.person)?.name||'未指定')}</td><td>${a.qty}</td><td><button class="danger" data-del-assign="${a.index}">刪除</button></td></tr>`).join('')}</table>`}).join(''):'<p class="empty">尚未建立分配。</p>';
+      $('tripList').innerHTML=data.trips.length?data.trips.slice().reverse().map((t,i)=>{const names=(t.participants||[]).map(id=>data.people.find(p=>p.id===id)?.name||id).filter(Boolean);return `<article class="trip"><h3>${esc(t.place)} <span class="muted">｜${esc(t.date)} ${t.rating?'｜'+t.rating+'／5':''}</span></h3>${names.length?`<p><strong>參與人員：</strong>${names.map(esc).join('、')}</p>`:''}${t.map?`<a href="${esc(t.map)}" target="_blank" rel="noopener">開啟地圖</a>`:''}<p>${esc(t.review).replace(/\n/g,'<br>')}</p>${(t.photos||[]).map(p=>`<img src="${p}" alt="露營照片">`).join('')}<br><button class="danger" data-del-trip="${data.trips.length-1-i}">刪除紀錄</button></article>`}).join(''):'<p class="empty">尚未有露營紀錄。</p>';
+    }
+    $('personForm').onsubmit=e=>{e.preventDefault();data.people.push({id:crypto.randomUUID(),name:$('personName').value.trim()});e.target.reset();save()};
+    $('gearForm').onsubmit=e=>{e.preventDefault();if(!$('gearOwner').value)return alert('請先新增人員');data.gear.push({name:$('gearName').value.trim(),owner:$('gearOwner').value,qty:+$('gearQty').value,note:$('gearNote').value.trim()});e.target.reset();save()};
+    $('outingForm').onsubmit=e=>{e.preventDefault();data.outings.push({date:$('outingDate').value,place:$('outingPlace').value.trim()});e.target.reset();save()};
+    $('assignForm').onsubmit=e=>{e.preventDefault();if(!$('assignOuting').value)return alert('請先新增出團');if(!$('assignGear').value)return alert('請先在人員與裝備登記裝備');if(!$('assignPerson').value)return alert('請先新增人員');data.assign.push({outing:+$('assignOuting').value,gear:+$('assignGear').value,person:$('assignPerson').value,qty:+$('assignQty').value});e.target.reset();save()};
+    $('clearAssign').onclick=()=>{if(confirm('確定清空本次分配？')){data.assign=[];save()}};
+    $('tripForm').onsubmit=async e=>{e.preventDefault();const files=[...$('tripPhotos').files],photos=await Promise.all(files.map(f=>new Promise(r=>{const x=new FileReader();x.onload=()=>r(x.result);x.readAsDataURL(f)}))),selected=[...$('tripParticipants').querySelectorAll('input:checked')].map(o=>o.value),others=$('tripOtherParticipants').value.split(/[,，]/).map(n=>n.trim()).filter(Boolean),participants=[...new Set([...selected,...others])];data.trips.push({date:$('tripDate').value,place:$('tripPlace').value.trim(),participants,map:$('tripMap').value.trim(),rating:$('tripRating').value,review:$('tripReview').value.trim(),photos});e.target.reset();save()};
+    document.addEventListener('click',e=>{const button=e.target.closest('button');const d=button?button.dataset:e.target.dataset;if(d.savePerson){const input=document.querySelector(`[data-person-name="${d.savePerson}"]`),name=input?.value.trim();if(!name)return alert('姓名不可空白');data.people.find(p=>p.id===d.savePerson).name=name;save()}if(d.delPerson){if(!confirm('刪除這位人員後，其裝備與攜帶分配也會一併刪除，確定繼續嗎？'))return;data.people=data.people.filter(p=>p.id!==d.delPerson);data.gear=data.gear.filter(g=>g.owner!==d.delPerson);data.assign=data.assign.filter(a=>a.person!==d.delPerson);save()}if(d.delGear){data.gear.splice(+d.delGear,1);save()}if(d.delAssign){data.assign.splice(+d.delAssign,1);save()}if(d.delOuting){const removed=+d.delOuting;data.assign=data.assign.filter(a=>a.outing!==removed).map(a=>a.outing>removed?{...a,outing:a.outing-1}:a);data.outings.splice(removed,1);save()}if(d.delTrip){data.trips.splice(+d.delTrip,1);save()}if(e.target.classList.contains('tab')){document.querySelectorAll('.tab,.panel').forEach(x=>x.classList.remove('active'));e.target.classList.add('active');$(e.target.dataset.tab).classList.add('active')}});
+    loadData();
+  </script>
+</body>
+</html>
